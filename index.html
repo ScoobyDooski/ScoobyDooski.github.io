@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CarParking</title>
+        <style>
+            #mapid {position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
+        </style>
+    </head>
+    <body>
+        <h1>Carpaking Application</h1>
+        <div id="mapid"></div>
+    
+        <script>
+            var mymap = L.map('mapid').setView([54.978, -1.618], 15);
+
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                maxZoom: 18,
+                id: 'mapbox/streets-v11',
+                tileSize: 512,
+                zoomOffset: -1,
+                accessToken: 'pk.eyJ1Ijoic2Nvb2J5ZG9vc2tpIiwiYSI6ImNrY3lkbXJoZjA4eTQycm5oaW8wcjhtdmkifQ.t3uw0LN6qHE1ppd_dKODFg'
+            }).addTo(mymap);
+            var fullIcon = L.icon({
+                iconUrl: 'images/red.png',
+                iconSize: [35, 50]
+            });
+            var emptyIcon = L.icon({
+                iconUrl: 'images/green.png',
+                iconSize: [35, 50]
+            })
+            var gettingFullIcon = L.icon({
+                iconUrl: 'images/yellow.png',
+                iconSize: [35, 50]
+            })
+            var waitingIcon = L.icon({
+                iconUrl: 'images/black.png',
+                iconSize: [35,50]
+            })
+            var markerClaremont = L.marker([54.98243,-1.61993], {icon:waitingIcon}).addTo(mymap);
+            markerClaremont.bindPopup("Waiting for data");
+            var markerDean = L.marker([54.97045,-1.60973], {icon:waitingIcon}).addTo(mymap);
+            markerDean.bindPopup("Waiting for data");
+            var markerEGarden = L.marker([54.97676,-1.61556], {icon:waitingIcon}).addTo(mymap);
+            markerEGarden.bindPopup("Waiting for data");
+            var markerESquare = L.marker([54.97598,-1.61540], {icon:waitingIcon}).addTo(mymap);
+            markerESquare.bindPopup("Waiting for data");
+            var markerEllison = L.marker([54.97606,-1.60804], {icon:waitingIcon}).addTo(mymap);
+            markerEllison.bindPopup("Waiting for data");
+            var markerGrainger = L.marker([54.96869,-1.62210], {icon:waitingIcon}).addTo(mymap);
+            markerGrainger.bindPopup("Waiting for data");
+            var markerManors = L.marker([54.97226,-1.60532], {icon:waitingIcon}).addTo(mymap);
+            markerManors.bindPopup("Waiting for data");
+            var markerGate = L.marker([54.97261,-1.62011], {icon:waitingIcon}).addTo(mymap);
+            markerGate.bindPopup("Waiting for data");
+            var markerQPark = L.marker([54.97223,-1.62013], {icon:waitingIcon}).addTo(mymap);
+            markerQPark.bindPopup("Waiting for data");
+            var markerQuayside = L.marker([54.97101,-1.60527], {icon:waitingIcon}).addTo(mymap);
+            markerQuayside.bindPopup("Waiting for data");
+            var markerStJames = L.marker([54.97404,-1.62257], {icon:waitingIcon}).addTo(mymap);
+            markerStJames.bindPopup("Waiting for data");
+            var markerOxford = L.marker([54.97850,-1.61058], {icon:waitingIcon}).addTo(mymap);
+            markerOxford.bindPopup("Waiting for data");
+            var markerDobson = L.marker([54.97654,-1.61139], {icon:waitingIcon}).addTo(mymap);
+            markerDobson.bindPopup("Waiting for data");
+            var markerCarliol = L.marker([54.972946,-1.608363], {icon:waitingIcon}).addTo(mymap);
+            markerCarliol.bindPopup("Waiting for data");
+            var markerStJohn = L.marker([54.970943,-1.615128], {icon:waitingIcon}).addTo(mymap);
+            markerStJohn.bindPopup("Waiting for data");
+        </script>
+        <script>
+            const ws = new WebSocket("wss://api.newcastle.urbanobservatory.ac.uk/stream");
+
+            ws.addEventListener("open", () => {
+                console.log("Connected");
+
+
+
+            });
+
+            ws.addEventListener("message", ({ data }) =>{
+                const carData = JSON.parse(data);
+                var totalSpots;
+                var occupiedSpots;
+                var emptySpots;
+                var percentFull;
+                
+                
+                function updateMarkers(pf){
+                    if(pf <= .75){
+                        return emptyIcon;
+                    } else if(pf <= .90){
+                        return gettingFullIcon;
+                    } else{
+                        return fullIcon;
+                    }
+                }
+
+                if(carData.data.brokerage.broker.id.includes("UTMC Open Car Park Feeds")){
+                    //console.log(carData);
+                    if(carData.data.entity.meta.name.includes("Claremont Road")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerClaremont.bindPopup("There are " + emptySpots + " spots available at Claremont Road.");
+                        markerClaremont.setIcon(updateMarkers(percentFull));
+                    }
+                    if(carData.data.entity.meta.name.includes("Dean Street")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerDean.bindPopup("There are " + emptySpots + " spots available at Dean Street.");
+                        markerDean.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Eldon Garden")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerEGarden.bindPopup("There are " + emptySpots + " spots available at Eldon Garden.");
+                        markerEGarden.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Eldon Square")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerESquare.bindPopup("There are " + emptySpots + " spots available at Eldon Square.");
+                        markerESquare.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Ellison Place")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerEllison.bindPopup("There are " + emptySpots + " spots available at Ellison Place.");
+                        markerEllison.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Grainger Town")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerGrainger.bindPopup("There are " + emptySpots + " spots available at Grainger Town.");
+                        markerGrainger.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Manors")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerManors.bindPopup("There are " + emptySpots + " spots available Manors.");
+                        markerManors.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("The Gate")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerGate.bindPopup("There are " + emptySpots + " spots available The Gate.");
+                        markerGate.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Q-Park")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerQPark.bindPopup("There are " + emptySpots + " spots available at Q-Park.");
+                        markerQPark.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Quayside Multi-Storey")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerQuayside.bindPopup("There are " + emptySpots + " spots available at Quayside Multi-Storey.");
+                        markerQuayside.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("St James' Park")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerStJames.bindPopup("There are " + emptySpots + " spots available at St James' Park.");
+                        markerStJames.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("Oxford Street")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerOxford.bindPopup("There are " + emptySpots + " spots available at Oxford Street.");
+                        markerOxford.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("NCP John Dobson St")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerDobson.bindPopup("There are " + emptySpots + " spots available John Dobson St.");
+                        markerDobson.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("NCP Carliol Sq")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerCarliol.bindPopup("There are " + emptySpots + " spots available Carliol Sq.");
+                        markerCarliol.setIcon(updateMarkers(percentFull));
+                    }
+
+                    if(carData.data.entity.meta.name.includes("NCP St John St")){
+                        totalSpots = carData.data.feed.meta.totalSpaces;
+                        occupiedSpots = carData.data.timeseries.value.data;
+                        emptySpots = totalSpots - occupiedSpots;
+                        percentFull = occupiedSpots/totalSpots;
+                        markerStJohn.bindPopup("There are " + emptySpots + " spots available St John Street.");
+                        markerStJohn.setIcon(updateMarkers(percentFull));
+                    }
+                    
+                }
+            });
+        </script>
+    </body>
+</html>
