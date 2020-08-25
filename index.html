@@ -46,45 +46,38 @@
                 iconSize: [35,50]
             })
             var markerClaremont = L.marker([54.98243,-1.61993], {icon:waitingIcon}).addTo(mymap);
-            markerClaremont.bindPopup("Waiting for data");
+            markerClaremont.bindPopup("No data currently avialable, There are 225 total spots at this car park.");
             var markerDean = L.marker([54.97045,-1.60973], {icon:waitingIcon}).addTo(mymap);
-            markerDean.bindPopup("Waiting for data");
+            markerDean.bindPopup("No data currently avialable, There are 257 total spots at this car park.");
             var markerEGarden = L.marker([54.97676,-1.61556], {icon:waitingIcon}).addTo(mymap);
-            markerEGarden.bindPopup("Waiting for data");
+            markerEGarden.bindPopup("No data currently avialable, There are 449 total spots at this car park.");
             var markerESquare = L.marker([54.97598,-1.61540], {icon:waitingIcon}).addTo(mymap);
-            markerESquare.bindPopup("Waiting for data");
+            markerESquare.bindPopup("No data currently avialable, There are 497 total spots at this car park.");
             var markerEllison = L.marker([54.97606,-1.60804], {icon:waitingIcon}).addTo(mymap);
-            markerEllison.bindPopup("Waiting for data");
+            markerEllison.bindPopup("No data currently avialable, There are 126 total spots at this car park.");
             var markerGrainger = L.marker([54.96869,-1.62210], {icon:waitingIcon}).addTo(mymap);
-            markerGrainger.bindPopup("Waiting for data");
+            markerGrainger.bindPopup("No data currently avialable, There are 410 total spots at this car park.");
             var markerManors = L.marker([54.97226,-1.60532], {icon:waitingIcon}).addTo(mymap);
-            markerManors.bindPopup("Waiting for data");
+            markerManors.bindPopup("No data currently avialable, There are 484 total spots at this car park.");
             var markerGate = L.marker([54.97261,-1.62011], {icon:waitingIcon}).addTo(mymap);
-            markerGate.bindPopup("Waiting for data");
+            markerGate.bindPopup("No data currently avialable, There are 250 total spots at this car park.");
             var markerQPark = L.marker([54.97223,-1.62013], {icon:waitingIcon}).addTo(mymap);
-            markerQPark.bindPopup("Waiting for data");
+            markerQPark.bindPopup("No data currently avialable, There are 266 total spots at this car park.");
             var markerQuayside = L.marker([54.97101,-1.60527], {icon:waitingIcon}).addTo(mymap);
-            markerQuayside.bindPopup("Waiting for data");
+            markerQuayside.bindPopup("No data currently avialable, There are 499 total spots at this car park.");
             var markerStJames = L.marker([54.97404,-1.62257], {icon:waitingIcon}).addTo(mymap);
-            markerStJames.bindPopup("Waiting for data");
+            markerStJames.bindPopup("No data currently avialable, There are 545 total spots at this car park.");
             var markerOxford = L.marker([54.97850,-1.61058], {icon:waitingIcon}).addTo(mymap);
-            markerOxford.bindPopup("Waiting for data");
+            markerOxford.bindPopup("No data currently avialable, There are 139 total spots at this car park.");
             var markerDobson = L.marker([54.97654,-1.61139], {icon:waitingIcon}).addTo(mymap);
-            markerDobson.bindPopup("Waiting for data");
+            markerDobson.bindPopup("No data currently avialable, There are 552 total spots at this car park.");
             var markerCarliol = L.marker([54.972946,-1.608363], {icon:waitingIcon}).addTo(mymap);
-            markerCarliol.bindPopup("Waiting for data");
+            markerCarliol.bindPopup("No data currently avialable, There are 138 total spots at this car park.");
             var markerStJohn = L.marker([54.970943,-1.615128], {icon:waitingIcon}).addTo(mymap);
-            markerStJohn.bindPopup("Waiting for data");
+            markerStJohn.bindPopup("No data currently avialable, There are 19 total spots at this car park.");
         </script>
         <script>
             const ws = new WebSocket("wss://api.newcastle.urbanobservatory.ac.uk/stream");
-
-            ws.addEventListener("open", () => {
-                console.log("Connected");
-
-
-
-            });
 
             ws.addEventListener("message", ({ data }) =>{
                 const carData = JSON.parse(data);
@@ -92,7 +85,6 @@
                 var occupiedSpots;
                 var emptySpots;
                 var percentFull;
-                
                 
                 function updateMarkers(pf){
                     if(pf <= .75){
@@ -105,7 +97,7 @@
                 }
 
                 if(carData.data.brokerage.broker.id.includes("UTMC Open Car Park Feeds")){
-                    //console.log(carData);
+                    console.log(carData);
                     if(carData.data.entity.meta.name.includes("Claremont Road")){
                         totalSpots = carData.data.feed.meta.totalSpaces;
                         occupiedSpots = carData.data.timeseries.value.data;
