@@ -50,7 +50,7 @@ const markers = [{name: "Claremont Road", markerName: "markerClaremont", locatio
 var i;
 for (i = 0; i < markers.length; i++){
     var newMarker = L.marker(markers[i].location, {icon:waitingIcon}).addTo(mymap);
-    newMarker.bindPopup("No data currently avialable, There are " + markers[i].totalSpots + " total spots at this car park.");
+    newMarker.bindPopup("No data currently available, There are " + markers[i].totalSpots + " total spots at this car park.");
     markers[i].markerName = newMarker;
 };
 
