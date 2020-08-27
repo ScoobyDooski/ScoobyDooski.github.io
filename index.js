@@ -1,3 +1,4 @@
+//Initialising Leaflet JS Map and tileset
 var mymap = L.map('mapid').setView([54.978, -1.618], 15);
 
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -8,6 +9,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     zoomOffset: -1,
     accessToken: 'pk.eyJ1Ijoic2Nvb2J5ZG9vc2tpIiwiYSI6ImNrY3lkbXJoZjA4eTQycm5oaW8wcjhtdmkifQ.t3uw0LN6qHE1ppd_dKODFg'
 }).addTo(mymap);
+//Used to create different icon images used to change color of icons later
 var fullIcon = L.icon({
     iconUrl: 'images/red.png',
     iconSize: [35, 50]
@@ -24,9 +26,10 @@ var waitingIcon = L.icon({
     iconUrl: 'images/black.png',
     iconSize: [35,50]
 })
-
+//Websocket connection to Urban observatory API
 const ws = new WebSocket("wss://api.newcastle.urbanobservatory.ac.uk/stream");
 
+//Creates the array of all car park locations, as well as their relevant info
 const markers = [{name: "Claremont Road", markerName: "markerClaremont", location: [54.98243,-1.61993], totalSpots: 255},
 {name: "Dean Street", markerName: "markerDean", location: [54.97045,-1.60973], totalSpots: 257},
 {name: "Eldon Garden", markerName: "markerEGarden", location: [54.97676,-1.61556], totalSpots: 449},
@@ -43,6 +46,7 @@ const markers = [{name: "Claremont Road", markerName: "markerClaremont", locatio
 {name: "NCP Carliol Sq", markerName: "markerCarliol", location: [54.972946,-1.608363], totalSpots: 138},
 {name: "NCP St John St", markerName: "markerStJohn", location: [54.970943,-1.615128], totalSpots: 19},]
 
+//Itterates through the array of car parks above and creates the initial markers and places them on the map
 var i;
 for (i = 0; i < markers.length; i++){
     var newMarker = L.marker(markers[i].location, {icon:waitingIcon}).addTo(mymap);
@@ -50,6 +54,7 @@ for (i = 0; i < markers.length; i++){
     markers[i].markerName = newMarker;
 };
 
+//Returns the correct marker image depending on the occupacy level
 function changeIcon(pf){
     if(pf <= .75){
         return emptyIcon;
@@ -60,7 +65,9 @@ function changeIcon(pf){
     }
 }
 
+//Event listener for the Urban Observatory API
 ws.addEventListener("message", ({ data }) =>{
+    //Turns the data stream comming in from API to JSON for ease of use
     const carData = JSON.parse(data);
  
     let totalSpots;
@@ -68,13 +75,16 @@ ws.addEventListener("message", ({ data }) =>{
     let emptySpots;
     let percentFull;
 
+    //Goes through the marker array to check if any new data from API matches any of our car parks.
     function updateMarkers(){
         for(i = 0; i < markers.length; i++){
+            //If we get a match, pull in the data from that car park.
             if(carData.data.entity.meta.name.includes(markers[i].name)){
                 totalSpots = carData.data.feed.meta.totalSpaces;
                 occupiedSpots = carData.data.timeseries.value.data;
                 emptySpots = totalSpots - occupiedSpots;
                 percentFull = occupiedSpots/totalSpots;
+                //Updates the marker on the map for that specifc car park
                 markers[i].markerName.bindPopup("There are " + emptySpots + " spots available at " + markers[i].name + ".")
                 markers[i].markerName.setIcon(changeIcon(percentFull));
             }
