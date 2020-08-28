@@ -1,4 +1,5 @@
 //Initialising Leaflet JS Map and tileset
+//Code lines 3-12 taken by https://leafletjs.com/examples/quick-start/ as per instructions on setup of map and tileset
 var mymap = L.map('mapid').setView([54.978, -1.618], 15);
 
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -50,7 +51,8 @@ const markers = [{name: "Claremont Road", markerName: "markerClaremont", locatio
 var i;
 for (i = 0; i < markers.length; i++){
     var newMarker = L.marker(markers[i].location, {icon:waitingIcon}).addTo(mymap);
-    newMarker.bindPopup("No data currently available, There are " + markers[i].totalSpots + " total spots at this car park.");
+    newMarker.bindPopup("No data currently available, There are " + markers[i].totalSpots 
+    + " total spots at this car park.");
     markers[i].markerName = newMarker;
 };
 
